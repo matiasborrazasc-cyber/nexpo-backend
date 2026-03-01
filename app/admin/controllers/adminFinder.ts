@@ -66,8 +66,16 @@ export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || typeof email !== 'string' || !email.trim()) {
+            res.json({
+                message: "Email o contraseña inválida",
+                status: 401,
+                data: null
+            });
+            return;
+        }
 
-        const admin = await getAdminByEmail(email);
+        const admin = await getAdminByEmail(email.trim());
 
         if (!admin) {
             res.json({

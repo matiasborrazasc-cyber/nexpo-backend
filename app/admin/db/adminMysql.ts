@@ -104,6 +104,9 @@ export async function getAdmin() {
 
 export async function getAdminByEmail(email: string) {
     try {
+        if (email == null || email === undefined || (typeof email === 'string' && !email.trim())) {
+            return null;
+        }
         const [results] = await db.query(
             `
             SELECT a.*, f.uuid as fairUuid, f.name as fairName

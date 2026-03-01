@@ -3,6 +3,9 @@ import db from '../../../config/connection';
 
 /** Cuenta registros por fair en una tabla. */
 async function countByFair(table: string, fairColumn: string, fair: string): Promise<number> {
+    if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+        return 0;
+    }
     const [rows] = await db.query<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM \`${table}\` WHERE \`${fairColumn}\` = ? AND \`deletedAt\` IS NULL`,
         [fair]
@@ -12,6 +15,9 @@ async function countByFair(table: string, fairColumn: string, fair: string): Pro
 
 /** Cuenta users_fair por fair. */
 async function countUsersFair(fair: string): Promise<number> {
+    if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+        return 0;
+    }
     const [rows] = await db.query<RowDataPacket[]>(
         'SELECT COUNT(*) as total FROM `users_fair` WHERE `fair` = ? AND `deletedAt` IS NULL',
         [fair]
@@ -41,6 +47,9 @@ export async function getDashboardStats(fair: string) {
 
 /** Próximos eventos (fecha >= hoy, ordenados por fecha, límite 7). */
 export async function getUpcomingEvents(fair: string) {
+    if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+        return [];
+    }
     const [rows] = await db.query<RowDataPacket[]>(
         `SELECT uuid, name, date, hour, place FROM event_calendar 
          WHERE fair = ? AND deletedAt IS NULL AND date >= CURDATE() 

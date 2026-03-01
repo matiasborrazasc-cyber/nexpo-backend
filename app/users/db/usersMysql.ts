@@ -45,16 +45,16 @@ export async function updateProfile(uuid: string, data: { name?: string; descrip
         const updates: string[] = [];
         const values: any[] = [];
         if (data.name !== undefined) {
-            updates.push('`name` = ?');
-            values.push(data.name);
+            updates.push(data.name === null ? '`name` = NULL' : '`name` = ?');
+            if (data.name !== null) values.push(data.name);
         }
         if (data.description !== undefined) {
-            updates.push('`description` = ?');
-            values.push(data.description);
+            updates.push(data.description === null ? '`description` = NULL' : '`description` = ?');
+            if (data.description !== null) values.push(data.description);
         }
         if (data.picture !== undefined) {
-            updates.push('`picture` = ?');
-            values.push(data.picture);
+            updates.push(data.picture === null ? '`picture` = NULL' : '`picture` = ?');
+            if (data.picture !== null) values.push(data.picture);
         }
         if (updates.length === 0) return null;
         updates.push('`updatedAt` = NOW()');
@@ -139,6 +139,9 @@ export async function getUsers() {
 
 export async function getUserByEmail(email: string) {
     try {
+        if (email == null || email === undefined || (typeof email === 'string' && !email.trim())) {
+            return null;
+        }
         const [results] = await db.query(
             `
             SELECT *
