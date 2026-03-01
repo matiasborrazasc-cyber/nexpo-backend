@@ -266,6 +266,31 @@ pm2 restart fair-api
 
 ---
 
+## ⚠️ IMPORTANTE: Usar nexpo-backend (no fair)
+
+Si tu API es **nexpo-backend** (no el backend `fair`), usa estas rutas:
+
+**Desde tu máquina (despliegue manual):**
+
+```bash
+cd /Users/wonasportsdev/Desktop/projects/fair/nexpo-backend
+npm run build
+scp -r dist package.json package-lock.json .env root@64.23.187.211:/var/www/fair-api/
+```
+
+**En el servidor (reiniciar):**
+
+```bash
+ssh root@64.23.187.211
+cd /var/www/fair-api
+pm2 restart fair-api
+pm2 logs fair-api --lines 50
+```
+
+Si el proceso tiene otro nombre, usa `pm2 list` para verlo.
+
+---
+
 ## URLs finales
 
 - API: `http://TU_IP/api/...`

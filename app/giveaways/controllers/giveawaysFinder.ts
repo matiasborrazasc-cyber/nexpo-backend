@@ -28,9 +28,17 @@ export const getGiveawaysByUuidController = async (req: Request, res: Response) 
     }
 }
 
+/** Extrae el UUID de fair de forma segura (string o {uuid, name}) */
+function getFairUuid(fair: any): string | null {
+    if (fair == null || fair === undefined) return null;
+    if (typeof fair === 'string' && fair.trim()) return fair.trim();
+    if (typeof fair === 'object' && fair.uuid && typeof fair.uuid === 'string') return fair.uuid.trim();
+    return null;
+}
+
 export const getGiveawaysController = async (req: Request, res: Response) => {
     try {
-        const fair = req.user?.fair?.uuid ?? req.user?.fair;
+        const fair = getFairUuid(req.user?.fair);
         if (!fair) {
             res.json({ message: "Fair no encontrado", status: 400, data: null });
             return;
