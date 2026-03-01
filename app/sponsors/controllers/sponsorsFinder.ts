@@ -31,6 +31,10 @@ export const getSponsorsByUuidController = async (req: Request, res: Response) =
 export const getSponsorsController = async (req: Request, res: Response) => {
     try {
         const fair = req.user?.fair?.uuid ?? req.user?.fair;
+        if (!fair) {
+            res.json({ message: "Fair no encontrado", status: 400, data: [] });
+            return;
+        }
         const sponsors = await getSponsors(fair);
         if (sponsors && sponsors.length > 0) {
             res.json({

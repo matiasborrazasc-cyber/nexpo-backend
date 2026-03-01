@@ -24,14 +24,16 @@ export async function createCupons(cupons: Cupons) {
     }
 }
 
+const safe = (v: any) => (v === undefined ? null : v);
+
 export async function update(cupons: Cupons) {
     try {
         await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `description` = ?, `title` = ?, `picture` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                cupons.getDescription(),
-                cupons.getTitle(),
-                cupons.getPicture(),
+                safe(cupons.getDescription()) ?? '',
+                safe(cupons.getTitle()) ?? '',
+                safe(cupons.getPicture()) ?? '',
                 cupons.getUuid()
             ]
         );
@@ -82,6 +84,9 @@ export async function getCupon(uuid: string) {
 
 export async function getCupons(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE `fair` = ? AND `deletedAt` IS NULL',
             [fair]

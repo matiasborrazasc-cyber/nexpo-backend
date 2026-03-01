@@ -29,16 +29,18 @@ export async function createSponsors(sponsors: Sponsors) {
     }
 }
 
+const safe = (v: any) => (v === undefined ? null : v);
+
 export async function update(sponsors: Sponsors) {
     try {
         await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `name` = ?, `description` = ?, `image` = ?, `email` = ?, `phone` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                sponsors.getName(),
-                sponsors.getDescription(),
-                sponsors.getImage(),
-                sponsors.getEmail(),
-                sponsors.getPhone(),
+                safe(sponsors.getName()) ?? '',
+                safe(sponsors.getDescription()) ?? '',
+                safe(sponsors.getImage()) ?? '',
+                safe(sponsors.getEmail()) ?? '',
+                safe(sponsors.getPhone()) ?? '',
                 sponsors.getUuid()
             ]
         );
@@ -88,6 +90,9 @@ export async function getSponsor(uuid: string) {
 
 export async function getSponsors(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE `fair` = ? AND `deletedAt` IS NULL',
             [fair]

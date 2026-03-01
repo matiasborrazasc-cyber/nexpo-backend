@@ -27,16 +27,18 @@ export async function createGiveaways(giveaways: Giveaways) {
     }
 }
 
+const safe = (v: any) => (v === undefined ? null : v);
+
 export async function update(giveaways: Giveaways) {
     try {
         await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `date` = ?, `hour` = ?, `name` = ?, `picture` = ?, `description` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                giveaways.getDate(),
-                giveaways.getHour(),
-                giveaways.getName(),
-                giveaways.getPicture(),
-                giveaways.getDescription(),
+                safe(giveaways.getDate()) ?? '',
+                safe(giveaways.getHour()) ?? '',
+                safe(giveaways.getName()) ?? '',
+                safe(giveaways.getPicture()) ?? '',
+                safe(giveaways.getDescription()) ?? '',
                 giveaways.getUuid()
             ]
         );
@@ -90,6 +92,9 @@ export async function getGiveawaysByUuid(uuid: string) {
 
 export async function getGiveaways(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE `deletedAt` IS NULL AND `fair` = ?',
             [fair]

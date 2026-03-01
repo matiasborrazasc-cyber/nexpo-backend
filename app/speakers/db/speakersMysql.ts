@@ -28,18 +28,20 @@ export async function createSpeakers(speakers: Speakers) {
     }
 }
 
+const safe = (v: any) => (v === undefined ? null : v);
+
 export async function update(speakers: Speakers) {
     try {
         const [results] = await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `name` = ?, `email` = ?, `whatsapp` = ?, `instagram` = ?, `twitter` = ?, `picture` = ?, `description` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                speakers.getName(),
-                speakers.getEmail(),
-                speakers.getWhatsapp(),
-                speakers.getInstagram(),
-                speakers.getTwitter(),
-                speakers.getPicture(),
-                speakers.getDescription(),
+                safe(speakers.getName()) ?? '',
+                safe(speakers.getEmail()) ?? '',
+                safe(speakers.getWhatsapp()) ?? '',
+                safe(speakers.getInstagram()) ?? '',
+                safe(speakers.getTwitter()) ?? '',
+                safe(speakers.getPicture()) ?? '',
+                safe(speakers.getDescription()) ?? '',
                 speakers.getUuid()
             ]
         );
@@ -94,6 +96,9 @@ export async function getSpeaker(uuid: string) {
 
 export async function getSpeakers(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE `fair` = ? AND `deletedAt` IS NULL',
             [fair]

@@ -29,19 +29,21 @@ export async function createEventCalendar(eventCalendar: EventCalendar) {
     }
 }
 
+const safe = (v: any) => (v === undefined ? null : v);
+
 export async function update(eventCalendar: EventCalendar) {
     try {
         await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `date` = ?, `hour` = ?, `name` = ?, `link` = ?, `description` = ?, `picture` = ?, `people` = ?, `place` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                eventCalendar.getDate(),
-                eventCalendar.getHour(),
-                eventCalendar.getName(),
-                eventCalendar.getLink(),
-                eventCalendar.getDescription(),
-                eventCalendar.getPicture(),
-                eventCalendar.getPeople(),
-                eventCalendar.getPlace(),
+                safe(eventCalendar.getDate()) ?? '',
+                safe(eventCalendar.getHour()) ?? '',
+                safe(eventCalendar.getName()) ?? '',
+                safe(eventCalendar.getLink()) ?? '',
+                safe(eventCalendar.getDescription()) ?? '',
+                safe(eventCalendar.getPicture()) ?? '',
+                safe(eventCalendar.getPeople()) ?? '',
+                safe(eventCalendar.getPlace()) ?? '',
                 eventCalendar.getUuid()
             ]
         );
@@ -97,6 +99,9 @@ export async function getEventCalendar(uuid: string) {
 
 export async function getEventCalendars(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE fair = ? AND `deletedAt` IS NULL',
             [fair]
