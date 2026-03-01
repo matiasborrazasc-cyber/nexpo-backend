@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getArticle, getArticles } from "../db/articlesMysql";
 import ArticlesFactory from "../articlesFactory";
-
+import { getFairUuid } from "../../utils/fairUtils";
 
 export const getArticleController = async (req: Request, res: Response) => {
     try {
@@ -31,21 +31,13 @@ export const getArticleController = async (req: Request, res: Response) => {
 
 export const getArticlesController = async (req: Request, res: Response) => {
     try {
-        const fair = req.user?.fair.uuid;
-        const users = await getArticles(fair);
-        if (users && users.length > 0) {
-            res.json({
-                message: "",
-                status: 200,
-                data: users.map(user => ArticlesFactory.articlesToJson(user))
-            });
-        } else {
-            res.json({
-                message: "",
-                status: 200,
-                data: []
-            });
-        }
+        const fair = getFairUuid(req.user?.fair);
+        const users = fair ? await getArticles(fair) : [];
+        res.json({
+            message: "",
+            status: 200,
+            data: users && users.length > 0 ? users.map(user => ArticlesFactory.articlesToJson(user)) : []
+        });
     } catch (err: any) {
         res.json({
             message: err.message,

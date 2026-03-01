@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getGiveaways, getGiveawaysByUuid } from "../db/giveawaysMysql";
 import GiveawaysFactory from "../giveawaysFactory";
+import { getFairUuid } from "../../utils/fairUtils";
 
 export const getGiveawaysByUuidController = async (req: Request, res: Response) => {
     try {
@@ -28,19 +29,11 @@ export const getGiveawaysByUuidController = async (req: Request, res: Response) 
     }
 }
 
-/** Extrae el UUID de fair de forma segura (string o {uuid, name}) */
-function getFairUuid(fair: any): string | null {
-    if (fair == null || fair === undefined) return null;
-    if (typeof fair === 'string' && fair.trim()) return fair.trim();
-    if (typeof fair === 'object' && fair.uuid && typeof fair.uuid === 'string') return fair.uuid.trim();
-    return null;
-}
-
 export const getGiveawaysController = async (req: Request, res: Response) => {
     try {
         const fair = getFairUuid(req.user?.fair);
         if (!fair) {
-            res.json({ message: "Fair no encontrado", status: 400, data: null });
+            res.json({ message: "", status: 200, data: [] });
             return;
         }
         const giveaways = await getGiveaways(fair);

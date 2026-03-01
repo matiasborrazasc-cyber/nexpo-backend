@@ -8,7 +8,7 @@ export const updateController = async (req: Request, res: Response) => {
         const data = req.body;
         const fair = req.user?.fair?.uuid ?? req.user?.fair;
         if (!fair) {
-            res.status(400).json({ message: "Fair no encontrado", status: 400, data: null });
+            res.json({ message: "", status: 200, data: null });
             return;
         }
         const influencer = InfluencerFactory.createInfluencer({ ...data, uuid, fair });

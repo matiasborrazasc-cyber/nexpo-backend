@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getEventCalendar, getEventCalendars } from "../db/eventCalendarMysql";
 import EventCalendarFactory from "../eventCalendarFactory";
+import { getFairUuid } from "../../utils/fairUtils";
 
 export const getEventCalendarController = async (req: Request, res: Response) => {
     try {
@@ -30,25 +31,13 @@ export const getEventCalendarController = async (req: Request, res: Response) =>
 
 export const getEventCalendarsController = async (req: Request, res: Response) => {
     try {
-        const fair = req.user?.fair?.uuid ?? req.user?.fair;
-        if (!fair) {
-            res.json({ message: "Fair no encontrado", status: 400, data: null });
-            return;
-        }
-        const eventCalendar = await getEventCalendars(fair);
-        if (eventCalendar && eventCalendar.length > 0) {
-            res.json({
-                message: "",
-                status: 200,
-                data: eventCalendar.map(ev => EventCalendarFactory.eventCalendarToJson(ev))
-            });
-        } else {
-            res.json({
-                message: "",
-                status: 200,
-                data: []
-            });
-        }
+        const fair = getFairUuid(req.user?.fair);
+        const eventCalendar = fair ? await getEventCalendars(fair) : [];
+        res.json({
+            message: "",
+            status: 200,
+            data: eventCalendar && eventCalendar.length > 0 ? eventCalendar.map(ev => EventCalendarFactory.eventCalendarToJson(ev)) : []
+        });
     } catch (err: any) {
         res.json({
             message: err.message,

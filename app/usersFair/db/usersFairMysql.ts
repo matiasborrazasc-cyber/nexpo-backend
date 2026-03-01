@@ -75,6 +75,9 @@ export async function getUserFair(uuid: string) {
 
 export async function getUsersFair(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             `
   SELECT t.*, u.name as userName, u.email as userEmail
@@ -106,6 +109,9 @@ export async function getUsersFair(fair: string) {
 /** Lista users_fair con datos del user (name, email) para el fair dado. Solo incluye quienes tienen match_visible=1 (para Participantes/Explorar en la app). */
 export async function getUsersFairWithUserInfo(fair: string): Promise<Array<{ uuid: string; fair: string; user: string; name: string; email: string }>> {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             `
   SELECT t.uuid, t.fair, t.user, u.name as name, u.email as email
@@ -136,6 +142,9 @@ export async function getUsersFairWithUserInfo(fair: string): Promise<Array<{ uu
 /** Lista TODOS los users_fair con datos del user (para admin dashboard). No filtra por match_visible. */
 export async function getUsersFairWithUserInfoAll(fair: string): Promise<Array<{ uuid: string; fair: string; user: string; name: string; email: string }>> {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             `
   SELECT t.uuid, t.fair, t.user, u.name as name, u.email as email

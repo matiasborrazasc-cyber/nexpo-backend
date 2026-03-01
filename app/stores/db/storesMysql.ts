@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2';
 import db from '../../../config/connection';
 import Stores from '../model/stores';
 import StoresFactory from '../storesFactory';
+import { safe } from '../../utils/fairUtils';
 
 const TABLE_NAME = 'stores';
 
@@ -38,17 +39,17 @@ export async function update(stores: Stores) {
         const [results] = await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `name` = ?, `description` = ?, `portada` = ?, `image` = ?, `email` = ?, `whatsapp` = ?, `instagram` = ?, `facebook` = ?, `user` = ?, `category` = ?, `typeOfStand` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                stores.getName(),
-                stores.getDescription(),
-                stores.getPortada(),
-                stores.getImage(),
-                stores.getEmail(),
-                stores.getWhatsapp(),
-                stores.getInstagram(),
-                stores.getFacebook(),
-                stores.getUser(),
-                stores.getCategory(),
-                stores.getTypeOfStand(),
+                safe(stores.getName()) ?? '',
+                safe(stores.getDescription()) ?? '',
+                safe(stores.getPortada()) ?? '',
+                safe(stores.getImage()) ?? '',
+                safe(stores.getEmail()) ?? '',
+                safe(stores.getWhatsapp()) ?? '',
+                safe(stores.getInstagram()) ?? '',
+                safe(stores.getFacebook()) ?? '',
+                safe(stores.getUser()) ?? '',
+                safe(stores.getCategory()) ?? '',
+                safe(stores.getTypeOfStand()) ?? '',
                 stores.getUuid()
             ]
         );
@@ -75,6 +76,9 @@ export async function deleteStores(uuid: string) {
 
 export async function getStore(uuid: string, fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return null;
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE `uuid` = ? AND  `fair` = ? AND `deletedAt` IS NULL',
             [uuid, fair]
@@ -108,6 +112,9 @@ export async function getStore(uuid: string, fair: string) {
 
 export async function getStores(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE fair = ? AND `deletedAt` IS NULL',
             [fair]

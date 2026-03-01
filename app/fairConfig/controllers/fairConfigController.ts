@@ -65,11 +65,7 @@ export const updateConfigController = async (req: Request, res: Response) => {
     try {
         const fairUuid = getFairUuid(req);
         if (!fairUuid) {
-            res.json({
-                message: 'Fair no encontrado',
-                status: 400,
-                data: null,
-            });
+            res.json({ message: '', status: 200, data: null });
             return;
         }
         const { primaryColor } = req.body;

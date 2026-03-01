@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2';
 import db from '../../../config/connection';
 import ArticlesFactory from '../articlesFactory';
 import Articles from '../model/articles';
+import { safe } from '../../utils/fairUtils';
 
 const TABLE_NAME = 'articles';
 
@@ -31,11 +32,11 @@ export async function update(articles: Articles) {
         await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `name` = ?, `description` = ?, `imagen` = ?, `url` = ?, `category` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                articles.getName(),
-                articles.getDescription(),
-                articles.getImagen(),
-                articles.getUrl(),
-                articles.getCategory(),
+                safe(articles.getName()) ?? '',
+                safe(articles.getDescription()) ?? '',
+                safe(articles.getImagen()) ?? '',
+                safe(articles.getUrl()) ?? '',
+                safe(articles.getCategory()) ?? '',
                 articles.getUuid()
             ]
         );
@@ -89,6 +90,9 @@ export async function getArticle(uuid: string) {
 
 export async function getArticles(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE  `fair` = ? AND `deletedAt` IS NULL',
             [fair]

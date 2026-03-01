@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getUserFair, getUsersFairWithUserInfo } from "../db/usersFairMysql";
 import UsersFairFactory from "../usersFairFactory";
+import { getFairUuid } from "../../utils/fairUtils";
 
 export const getUserFairController = async (req: Request, res: Response) => {
     try {
@@ -30,9 +31,9 @@ export const getUserFairController = async (req: Request, res: Response) => {
 
 export const getUsersFairController = async (req: Request, res: Response) => {
     try {
-        const fair = req.user?.fair?.uuid ?? req.user?.fair;
+        const fair = getFairUuid(req.user?.fair);
         if (!fair) {
-            res.json({ message: "Fair no encontrado", status: 400, data: null });
+            res.json({ message: "", status: 200, data: [] });
             return;
         }
         const myUuid = (req as any).user?.uuid;

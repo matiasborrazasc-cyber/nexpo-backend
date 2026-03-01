@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2';
 import db from '../../../config/connection';
 import Product from '../model/product';
 import ProductsFactory from '../productsFactory';
+import { safe } from '../../utils/fairUtils';
 
 const TABLE_NAME = 'products';
 
@@ -33,12 +34,12 @@ export async function update(product: Product) {
         const [results] = await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `image` = ?, `price` = ?, `currency` = ?, `description` = ?, `title` = ?, `category` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                product.getImage(),
-                product.getPrice(),
-                product.getCurrency(),
-                product.getDescription(),
-                product.getTitle(),
-                product.getCategory(),
+                safe(product.getImage()) ?? '',
+                safe(product.getPrice()) ?? '',
+                safe(product.getCurrency()) ?? '',
+                safe(product.getDescription()) ?? '',
+                safe(product.getTitle()) ?? '',
+                safe(product.getCategory()) ?? '',
                 product.getUuid()
             ]
         );

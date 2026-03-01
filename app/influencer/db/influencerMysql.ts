@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2';
 import db from '../../../config/connection';
 import InfluencerFactory from '../influencerFactory';
 import Influencer from '../model/influencer';
+import { safe } from '../../utils/fairUtils';
 
 const TABLE_NAME = 'influencer';
 
@@ -29,7 +30,13 @@ export async function update(influencer: Influencer) {
     try {
         const [results] = await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `link` = ?, `redirection` = ? , `name`= ? , `email` = ?,  `updatedAt` = NOW() WHERE `uuid` = ?',
-            [influencer.getLink(), influencer.getRedirection(), influencer.getName(), influencer.getEmail(), influencer.getUuid()]
+            [
+                safe(influencer.getLink()) ?? '',
+                safe(influencer.getRedirection()) ?? '',
+                safe(influencer.getName()) ?? '',
+                safe(influencer.getEmail()) ?? '',
+                influencer.getUuid()
+            ]
         );
         return results;
     } catch (err) {
@@ -103,6 +110,9 @@ export async function getInfluencer(uuid: string) {
 
 export async function getInfluencers(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE fair = ? AND `deletedAt` IS NULL',
             [fair]

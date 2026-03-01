@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import BannerPublicityFactory from "../bannerPublicityFactory";
 import { getBannerPublicity, getBannersPublicity } from "../db/bannerPublicityMysql";
+import { getFairUuid } from "../../utils/fairUtils";
 
 export const getBannerPublicityController = async (req: Request, res: Response) => {
     try {
@@ -30,27 +31,13 @@ export const getBannerPublicityController = async (req: Request, res: Response) 
 
 export const getBannersPublicityController = async (req: Request, res: Response) => {
     try {
-        const fair = req.user?.fair?.uuid ?? req.user?.fair;
-        if (!fair) {
-            res.json({ message: "Fair no encontrado", status: 400, data: null });
-            return;
-        }
-        const bannerPublicity = await getBannersPublicity(fair);
-        if (bannerPublicity && bannerPublicity.length > 0) {
-            res.json({
-                message: "",
-                status: 200,
-                data: bannerPublicity.map(banner => {
-                    return BannerPublicityFactory.bannerPublicityToJson(banner);
-                })
-            })
-        } else {
-            res.json({
-                message: "",
-                status: 200,
-                data: []
-            });
-        }
+        const fair = getFairUuid(req.user?.fair);
+        const bannerPublicity = fair ? await getBannersPublicity(fair) : [];
+        res.json({
+            message: "",
+            status: 200,
+            data: bannerPublicity && bannerPublicity.length > 0 ? bannerPublicity.map(banner => BannerPublicityFactory.bannerPublicityToJson(banner)) : []
+        });
     } catch (err: any) {
         res.json({
             message: err.message,

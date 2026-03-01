@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import { update } from "../db/storesMysql";
 import StoresFactory from "../storesFactory";
+import { getFairUuid } from "../../utils/fairUtils";
 
 export const updateController = async (req: Request, res: Response) => {
     try {
         const uuid = req.params.uuid;
         const data = req.body;
-        const fair = req.user?.fair?.uuid ?? req.user?.fair;
+        const fair = getFairUuid(req.user?.fair);
         if (!fair) {
-            res.status(400).json({ message: "Fair no encontrado", status: 400, data: null });
+            res.json({ message: "", status: 200, data: null });
             return;
         }
         const store = StoresFactory.createStores({

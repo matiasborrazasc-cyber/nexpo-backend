@@ -8,7 +8,7 @@ export const updateController = async (req: Request, res: Response) => {
         const data = req.body;
         const fair = req.user?.fair?.uuid ?? req.user?.fair;
         if (!fair) {
-            res.json({ message: "Fair no encontrado", status: 400, data: null });
+            res.json({ message: "", status: 200, data: null });
             return;
         }
         const speakers = SpeakersFactory.createSpeaker({ ...data, uuid, fair });

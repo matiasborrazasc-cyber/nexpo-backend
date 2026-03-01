@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2';
 import db from '../../../config/connection';
 import BannerPublicityFactory from '../bannerPublicityFactory';
 import BannerPublicity from '../model/bannerPublicity';
+import { safe } from '../../utils/fairUtils';
 
 const TABLE_NAME = 'banner_publicity';
 
@@ -30,10 +31,10 @@ export async function update(bannerPublicity: BannerPublicity) {
         await db.query(
             'UPDATE `' + TABLE_NAME + '` SET `name` = ?, `url` = ?, `section` = ?, `sponsor` = ?, `updatedAt` = NOW() WHERE `uuid` = ?',
             [
-                bannerPublicity.getName(),
-                bannerPublicity.getUrl(),
-                bannerPublicity.getSection(),
-                bannerPublicity.getSponsor(),
+                safe(bannerPublicity.getName()) ?? '',
+                safe(bannerPublicity.getUrl()) ?? '',
+                safe(bannerPublicity.getSection()) ?? '',
+                safe(bannerPublicity.getSponsor()) ?? '',
                 bannerPublicity.getUuid()
             ]
         );
@@ -85,6 +86,9 @@ export async function getBannerPublicity(uuid: string) {
 
 export async function getBannersPublicity(fair: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE `fair` = ? AND `deletedAt` IS NULL',
             [fair]
@@ -112,6 +116,9 @@ export async function getBannersPublicity(fair: string) {
 
 export async function getBannersPublicityBySection(fair: string, section: string) {
     try {
+        if (fair == null || fair === undefined || (typeof fair === 'string' && !fair.trim())) {
+            return [];
+        }
         const [results] = await db.query(
             'SELECT * FROM `' + TABLE_NAME + '` WHERE `fair` = ? AND `section` = ? AND `deletedAt` IS NULL ORDER BY `createdAt` DESC',
             [fair, section]

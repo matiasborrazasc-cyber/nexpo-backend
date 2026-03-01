@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getSponsor, getSponsors } from "../db/sponsorsMysql";
 import SponsorsFactory from "../sponsorsFactory";
+import { getFairUuid } from "../../utils/fairUtils";
 
 export const getSponsorsByUuidController = async (req: Request, res: Response) => {
     try {
@@ -30,25 +31,13 @@ export const getSponsorsByUuidController = async (req: Request, res: Response) =
 
 export const getSponsorsController = async (req: Request, res: Response) => {
     try {
-        const fair = req.user?.fair?.uuid ?? req.user?.fair;
-        if (!fair) {
-            res.json({ message: "Fair no encontrado", status: 400, data: [] });
-            return;
-        }
-        const sponsors = await getSponsors(fair);
-        if (sponsors && sponsors.length > 0) {
-            res.json({
-                message: "",
-                status: 200,
-                data: sponsors.map(sponsor => SponsorsFactory.sponsorsToJson(sponsor))
-            });
-        } else {
-            res.json({
-                message: "",
-                status: 200,
-                data: []
-            });
-        }
+        const fair = getFairUuid(req.user?.fair);
+        const sponsors = fair ? await getSponsors(fair) : [];
+        res.json({
+            message: "",
+            status: 200,
+            data: sponsors && sponsors.length > 0 ? sponsors.map(sponsor => SponsorsFactory.sponsorsToJson(sponsor)) : []
+        });
     } catch (err: any) {
         res.json({
             message: err.message,
