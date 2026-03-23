@@ -22,6 +22,7 @@ import matchUsersRoutes from '../app/matchUsers/routes/matchUsersRoutes';
 import messagesRoutes from '../app/messages/routes/messagesRoutes';
 import fairConfigRoutes from '../app/fairConfig/routes/fairConfigRoutes';
 import dashboardRoutes from '../app/dashboard/routes/dashboardRoutes';
+import contactRoutes from '../app/contact/routes/contactRoutes';
 
 class Server {
 
@@ -64,6 +65,7 @@ class Server {
         this.app.use('/api/messages', messagesRoutes);
         this.app.use('/api/config', fairConfigRoutes);
         this.app.use('/api/dashboard', dashboardRoutes);
+        this.app.use('/api/contact', contactRoutes);
     }
 
     async listen() {

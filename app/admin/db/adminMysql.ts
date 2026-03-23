@@ -120,16 +120,17 @@ export async function getAdminByEmail(email: string) {
         const rows = results as RowDataPacket[];
 
         if (rows.length > 0) {
+            const fairUuid = rows[0].fairUuid ?? rows[0].fair;
             return AdminFactory.createAdmin({
                 uuid: rows[0].uuid,
                 name: rows[0].name,
                 email: rows[0].email,
                 role: rows[0].role,
                 password: rows[0].password,
-                fair: {
-                    uuid: rows[0].fairUuid,
+                fair: fairUuid ? {
+                    uuid: fairUuid,
                     name: rows[0].fairName
-                }
+                } : null
             });
         }
         return null;

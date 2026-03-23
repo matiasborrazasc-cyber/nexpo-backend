@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { getUser, getUserByEmail, getUsers } from "../db/usersMysql";
+import { getFairUuidsByUser } from "../../usersFair/db/usersFairMysql";
 import UsersFactory from "../usersFactory";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'clave_super_secreta';
+const JWT_SECRET = process.env.JWT_SECRET || 'clave_super_secreta';
+const DEFAULT_FAIR_UUID = '5755b802-f566-11ef-b15e-02d3accac345';
 
 
 
@@ -87,11 +89,20 @@ export const login = async (req: Request, res: Response) => {
             return;
         }
 
+        const requestedFairUuid = req.body.fairUuid as string | undefined;
+        const userFairs = await getFairUuidsByUser(admin.uuid);
+        let fairUuid = DEFAULT_FAIR_UUID;
+        if (requestedFairUuid && userFairs.includes(requestedFairUuid)) {
+            fairUuid = requestedFairUuid;
+        } else if (userFairs.length > 0) {
+            fairUuid = userFairs[0];
+        }
+
         const payload = {
             name: admin.name,
             uuid: admin.uuid,
             role: admin.role,
-            fair: { uuid: '5755b802-f566-11ef-b15e-02d3accac345' }
+            fair: { uuid: fairUuid }
         };
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });

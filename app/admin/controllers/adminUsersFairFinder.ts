@@ -5,6 +5,7 @@ import { getFairUuid } from "../../utils/fairUtils";
 /** GET /api/admin/users-fair - Lista TODOS los clientes de la feria (sin filtrar por match_visible). Para el dashboard admin. */
 export const getAdminUsersFairController = async (req: Request, res: Response) => {
     try {
+        console.log(req.user);
         const fair = getFairUuid((req as any).user?.fair);
         if (!fair) {
             res.json({ message: "", status: 200, data: [] });

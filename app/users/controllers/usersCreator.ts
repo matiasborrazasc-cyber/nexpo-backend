@@ -10,6 +10,7 @@ const DEFAULT_FAIR_UUID = '5755b802-f566-11ef-b15e-02d3accac345';
 export const create = async (req: Request, res: Response) => {
     try {
         const data = req.body;
+        const fairUuid = data.fairUuid || DEFAULT_FAIR_UUID;
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
@@ -21,7 +22,7 @@ export const create = async (req: Request, res: Response) => {
         const userUuid = users.getUuid();
         try {
             const usersFair = UsersFairFactory.createUsersFairFromData({
-                fair: DEFAULT_FAIR_UUID,
+                fair: fairUuid,
                 user: userUuid
             });
             await createUsersFair(usersFair);

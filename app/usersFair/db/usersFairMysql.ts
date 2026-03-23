@@ -171,6 +171,21 @@ export async function getUsersFairWithUserInfoAll(fair: string): Promise<Array<{
     }
 }
 
+/** Obtiene las ferias (uuid) en las que está el usuario. */
+export async function getFairUuidsByUser(userUuid: string): Promise<string[]> {
+    try {
+        const [results] = await db.query(
+            'SELECT fair FROM `' + TABLE_NAME + '` WHERE `user` = ? AND `deletedAt` IS NULL',
+            [userUuid]
+        );
+        const rows = results as RowDataPacket[];
+        return rows.map((r: any) => r.fair);
+    } catch (err) {
+        console.error("Error getFairUuidsByUser:", err);
+        throw err;
+    }
+}
+
 /** Obtiene users_fair por user y fair. */
 export async function getUsersFairByUserAndFair(user: string, fair: string) {
     try {

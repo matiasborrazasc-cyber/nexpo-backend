@@ -4,9 +4,7 @@ import AdminFactory from "../adminFactory";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-
-
-const JWT_SECRET = 'clave_super_secreta';
+const JWT_SECRET = process.env.JWT_SECRET || 'clave_super_secreta';
 
 
 export const getAdminByUuidController = async (req: Request, res: Response) => {
